@@ -84,6 +84,13 @@ void AT_CommandInit(void)
 	i ++;
 	
 	AT_CommandBuf[i].id = i;
+	AT_CommandBuf[i].len = strlen("INCL");
+	AT_CommandBuf[i].cmd = (char *)mymalloc(sizeof(char) * AT_CommandBuf[i].len + 1);
+	memset(AT_CommandBuf[i].cmd,0,AT_CommandBuf[i].len);
+	memcpy(AT_CommandBuf[i].cmd,"INCL",AT_CommandBuf[i].len);
+	i ++;
+	
+	AT_CommandBuf[i].id = i;
 	AT_CommandBuf[i].len = strlen("CSQ");
 	AT_CommandBuf[i].cmd = (char *)mymalloc(sizeof(char) * AT_CommandBuf[i].len + 1);
 	memset(AT_CommandBuf[i].cmd,0,AT_CommandBuf[i].len);
@@ -188,6 +195,10 @@ u16 AT_CommandDataAnalysis(u8 *inbuf,u16 inbuf_len,u8 *outbuf,u8 *hold_reg)
 					err_code = AT_CommandPORT(cmd_id,inbuf,inbuf_len,respbuf);
 				break;
 				
+				case INCL:
+					err_code = AT_CommandINCL(cmd_id,inbuf,inbuf_len,respbuf);
+				break;
+				
 				case CSQ:
 					err_code = AT_CommandCSQ(cmd_id,inbuf,inbuf_len,respbuf);
 				break;
@@ -289,7 +300,9 @@ u8 AT_CommandDEVNAME(u8 cmd_id,u8 *inbuf,u16 inbuf_len,u8 *respbuf)
 			{
 				CopyStrToPointer(&DeviceName, &content[1],content[0]);
 				
-				WriteDataFromHoldBufToEeprom(content,DEVICE_NAME_ADD, DEVICE_NAME_LEN - 2);
+				memcpy(&HoldReg[DEVICE_NAME_ADD],content,DEVICE_NAME_LEN - 2);
+				
+				WriteDataFromHoldBufToEeprom(&HoldReg[DEVICE_NAME_ADD],DEVICE_NAME_ADD, DEVICE_NAME_LEN - 2);
 				
 				ret = 0;
 			}
@@ -333,14 +346,16 @@ u8 AT_CommandDEVID(u8 cmd_id,u8 *inbuf,u16 inbuf_len,u8 *respbuf)
 			
 			for(i = 0; i < 6; i ++)
 			{
-				content_hex[i] = (content_str[i + 0] - 0x30) * 16 + (content_str[i + 1] - 0x30);
+				content_hex[i] = (content_str[i * 2 + 0] - 0x30) * 16 + (content_str[i * 2 + 1] - 0x30);
 			}
 			
 			if(content_str_len == 12)
 			{
 				CopyStrToPointer(&DeviceID, content_hex,content_str_len / 2);
 				
-				WriteDataFromHoldBufToEeprom(content_hex,DEVICE_ID_ADD, DEVICE_ID_LEN - 2);
+				memcpy(&HoldReg[DEVICE_ID_ADD],content_hex,DEVICE_ID_ADD - 2);
+				
+				WriteDataFromHoldBufToEeprom(&HoldReg[DEVICE_ID_ADD],DEVICE_ID_ADD, DEVICE_ID_LEN - 2);
 				
 				ret = 0;
 			}
@@ -381,7 +396,9 @@ u8 AT_CommandUUID(u8 cmd_id,u8 *inbuf,u16 inbuf_len,u8 *respbuf)
 			{
 				CopyStrToPointer(&DeviceUUID, content,content_len);
 				
-				WriteDataFromHoldBufToEeprom(content,UU_ID_ADD, UU_ID_LEN - 2);
+				memcpy(&HoldReg[UU_ID_ADD],content,UU_ID_ADD - 2);
+				
+				WriteDataFromHoldBufToEeprom(&HoldReg[UU_ID_ADD],UU_ID_ADD, UU_ID_LEN - 2);
 				
 				ret = 0;
 			}
@@ -411,7 +428,9 @@ u8 AT_CommandOPERATORS(u8 cmd_id,u8 *inbuf,u16 inbuf_len,u8 *respbuf)
 		{
 			Operators = content;
 			
-			WriteDataFromHoldBufToEeprom(&Operators,OPERATORS_ADD, OPERATORS_LEN - 2);
+			memcpy(&HoldReg[OPERATORS_ADD],&Operators,OPERATORS_ADD - 2);
+				
+			WriteDataFromHoldBufToEeprom(&HoldReg[OPERATORS_ADD],OPERATORS_ADD, OPERATORS_LEN - 2);
 			
 			ret = 0;
 		}
@@ -451,7 +470,9 @@ u8 AT_CommandAPN(u8 cmd_id,u8 *inbuf,u16 inbuf_len,u8 *respbuf)
 			{
 				CopyStrToPointer(&APName, &content[1],content[0]);
 				
-				WriteDataFromHoldBufToEeprom(content,APN_ADD, APN_LEN - 2);
+				memcpy(&HoldReg[APN_ADD],content,APN_ADD - 2);
+				
+				WriteDataFromHoldBufToEeprom(&HoldReg[APN_ADD],APN_ADD, APN_LEN - 2);
 				
 				ret = 0;
 			}
@@ -492,7 +513,9 @@ u8 AT_CommandDOMAIN(u8 cmd_id,u8 *inbuf,u16 inbuf_len,u8 *respbuf)
 			{
 				CopyStrToPointer(&ServerDomain, &content[1],content[0]);
 				
-				WriteDataFromHoldBufToEeprom(content,SERVER_DOMAIN_ADD, SERVER_DOMAIN_LEN - 2);
+				memcpy(&HoldReg[SERVER_DOMAIN_ADD],content,SERVER_DOMAIN_ADD - 2);
+				
+				WriteDataFromHoldBufToEeprom(&HoldReg[SERVER_DOMAIN_ADD],SERVER_DOMAIN_ADD, SERVER_DOMAIN_LEN - 2);
 				
 				ret = 0;
 			}
@@ -532,7 +555,9 @@ u8 AT_CommandIPADDRESS(u8 cmd_id,u8 *inbuf,u16 inbuf_len,u8 *respbuf)
 			{
 				CopyStrToPointer(&ServerIP, &content[1],content[0]);
 				
-				WriteDataFromHoldBufToEeprom(content,SERVER_IP_ADD, SERVER_IP_LEN - 2);
+				memcpy(&HoldReg[SERVER_IP_ADD],content,SERVER_IP_ADD - 2);
+				
+				WriteDataFromHoldBufToEeprom(&HoldReg[SERVER_IP_ADD],SERVER_IP_ADD, SERVER_IP_LEN - 2);
 				
 				ret = 0;
 			}
@@ -572,9 +597,59 @@ u8 AT_CommandPORT(u8 cmd_id,u8 *inbuf,u16 inbuf_len,u8 *respbuf)
 			{
 				CopyStrToPointer(&ServerPort, &content[1],content[0]);
 				
-				WriteDataFromHoldBufToEeprom(content,SERVER_PORT_ADD, SERVER_PORT_LEN - 2);
+				memcpy(&HoldReg[SERVER_PORT_ADD],content,SERVER_PORT_ADD - 2);
+				
+				WriteDataFromHoldBufToEeprom(&HoldReg[SERVER_PORT_ADD],SERVER_PORT_ADD, SERVER_PORT_LEN - 2);
 				
 				ret = 0;
+			}
+		}
+	}
+	
+	return ret;
+}
+
+//获取/设置传感器数据上传间隔
+u8 AT_CommandINCL(u8 cmd_id,u8 *inbuf,u16 inbuf_len,u8 *respbuf)
+{
+	u8 ret = 1;
+	u8 content_str[6];
+	u16 content_int;
+	u8 content_str_len = 0;
+
+	if(inbuf_len == AT_CommandBuf[cmd_id].len + 3 + 2)
+	{
+		sprintf((char *)respbuf, "incl: %d\r\n",UpLoadINCL);
+		ret = 0;
+	}
+	else if(inbuf_len <= AT_CommandBuf[cmd_id].len + 3 + 6 + 2 && \
+		MyStrstr(inbuf, (u8 *)"=", inbuf_len, 1) != 0xFFFF)
+	{
+		memset(content_str,0,6);
+		
+		if(get_str1(inbuf, "=", 1, "\r\n", 1, content_str))
+		{
+			content_str_len = strlen((char *)content_str);
+			
+			if(content_str_len < 6)
+			{
+				content_int = StringToInt(content_str);
+				
+				if(content_int < 60000 && content_int >= 10)
+				{
+					UpLoadINCL = content_int;
+					
+					memset(content_str,0,6);
+					
+					content_str[0] = (u8)(UpLoadINCL >> 8);
+					content_str[1] = (u8)(UpLoadINCL & 0x00FF);
+					
+					memcpy(&HoldReg[UPLOAD_INVL_ADD],content_str,UPLOAD_INVL_ADD - 2);
+				
+					WriteDataFromHoldBufToEeprom(&HoldReg[UPLOAD_INVL_ADD],UPLOAD_INVL_ADD, UPLOAD_INVL_LEN - 2);
+					
+					ret = 0;
+				}
 			}
 		}
 	}

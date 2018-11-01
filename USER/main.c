@@ -38,7 +38,7 @@ int main(void)
 //	{
 //		eepbuf[i] = AT24CXX_ReadOneByte(i);
 //	}
-	AT24CXX_WriteOneByte(UU_ID_ADD,255);
+//	AT24CXX_WriteOneByte(UU_ID_ADD,255);
 
 
 	mem_init();

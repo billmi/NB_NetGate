@@ -868,7 +868,7 @@ u8 ReadUpLoadINVL(void)
 
 		if(UpLoadINCL > MAX_UPLOAD_INVL)
 		{
-			UpLoadINCL = 10;
+			UpLoadINCL = 60;
 		}
 	}
 
@@ -998,6 +998,7 @@ void ReadParametersFromEEPROM(void)
 	ReadServerDomain();
 	ReadServerIP();
 	ReadServerPort();
+	ReadUpLoadINVL();
 	ReadOTAInfo(HoldReg);
 }
 

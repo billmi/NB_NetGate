@@ -16,7 +16,8 @@
 #define DOMAIN			7
 #define IPADDRESS		8
 #define PORT			9
-#define CSQ				10
+#define INCL			10
+#define CSQ				11
 
 
 
@@ -57,6 +58,7 @@ u8 AT_CommandAPN(u8 cmd_id,u8 *inbuf,u16 inbuf_len,u8 *respbuf);
 u8 AT_CommandDOMAIN(u8 cmd_id,u8 *inbuf,u16 inbuf_len,u8 *respbuf);
 u8 AT_CommandIPADDRESS(u8 cmd_id,u8 *inbuf,u16 inbuf_len,u8 *respbuf);
 u8 AT_CommandPORT(u8 cmd_id,u8 *inbuf,u16 inbuf_len,u8 *respbuf);
+u8 AT_CommandINCL(u8 cmd_id,u8 *inbuf,u16 inbuf_len,u8 *respbuf);
 u8 AT_CommandCSQ(u8 cmd_id,u8 *inbuf,u16 inbuf_len,u8 *respbuf);
 
 

@@ -286,8 +286,7 @@ unsigned char 	bg96_set_AT_QGPS(pBg96 *bg96);
 unsigned char 	bg96_set_AT_QGPSLOC(pBg96 *bg96,char *msg);
 unsigned char 	bg96_set_AT_QGPSEND(pBg96 *bg96);
 
-unsigned char bg96_set_AT_QNTP(pBg96 *bg96,char *server,unsigned short port,char *msg);
-
+unsigned char   bg96_set_AT_QNTP(pBg96 *bg96,char *server,unsigned short port,char *msg);
 
 void        	bg96_clear_rx_cmd_buffer(pBg96 *bg96);
 void        	bg96_get_char(pBg96 *bg96);

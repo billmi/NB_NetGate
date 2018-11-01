@@ -131,10 +131,13 @@ void SendHeartBeatPacket(void)
 	static time_t times_sec = 0;
 	u8 send_len = 0;
 	u8 cmd_id = 0;
-
+	u16 incl = 0;
+	
 	u8 send_buf[512];
+	
+	incl = DeviceUUID != NULL ? UpLoadINCL : 10;
 
-	if(GetSysTick1s() - times_sec >= UpLoadINCL)	//只有在数据上传周期大于20秒的时候才发送心跳包，间隔是20秒
+	if(GetSysTick1s() - times_sec >= incl)	//只有在数据上传周期大于20秒的时候才发送心跳包，间隔是20秒
 	{
 		times_sec = GetSysTick1s();
 

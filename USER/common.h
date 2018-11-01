@@ -333,6 +333,7 @@ u8 ReadAPN(void);
 u8 ReadServerDomain(void);
 u8 ReadServerIP(void);
 u8 ReadServerPort(void);
+u8 ReadUpLoadINVL(void);
 void WriteOTAInfo(u8 *hold_reg,u8 reset);
 u8 ReadOTAInfo(u8 *hold_reg);
 u16 PackNetData(u8 fun_code,u8 *inbuf,u16 inbuf_len,u8 *outbuf);
