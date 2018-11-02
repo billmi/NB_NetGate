@@ -19,6 +19,7 @@ SensorMsg_S *p_tSensorMsgNet = NULL;			//用于装在传感器数据的结构体变量
 //u8 *IpAddress = NULL;
 void vTaskNET(void *pvParameters)
 {
+	s8 res = 0;
 	time_t times_sec = 0;
 
 	BG96_InitStep1(&bg96);
@@ -56,11 +57,18 @@ void vTaskNET(void *pvParameters)
 		switch((u8)ConnectState)
 		{
 			case (u8)UNKNOW_ERROR:					//未知错误，重启模块
+				RE_RESET:
+				ConnectState = UNKNOW_ERROR;
 				BG96_InitStep2(&bg96);
 			break;
 
 			case (u8)GET_READY:						//模块已经就绪
-				TryToConnectToServer();
+				res = TryToConnectToServer();
+			
+				if(res == 0)						//打开链接失败
+				{
+					goto RE_RESET;					//复位模块
+				}
 			break;
 
 			case (u8)NEED_CLOSE:					//需要关闭移动场景
@@ -73,6 +81,13 @@ void vTaskNET(void *pvParameters)
 
 			case (u8)ON_SERVER:						//已经连接到服务器
 				OnServerHandle();
+				
+				res = OnServerHandle();
+				
+				if(res == -1)
+				{
+					goto RE_RESET;					//复位模块
+				}
 			break;
 
 			default:
@@ -95,9 +110,10 @@ u8 TryToConnectToServer(void)
 }
 
 //在线处理进程
-void OnServerHandle(void)
+s8 OnServerHandle(void)
 {
-	u16 len = 0;
+	s8 ret = 0;
+	s16 len = 0;
 	u16 net_send_len = 0;
 	u8 net_send_buf[512];
 	
@@ -108,6 +124,10 @@ void OnServerHandle(void)
 	if(len > 0)
 	{
 		len = tcp->send(&tcp, net_send_buf, len);						//把数据发送到服务器
+	}
+	else if(len < 0)
+	{
+		ret = -1;													//一分钟内没有收到数据，强行关闭连接
 	}
 
 	if(Usart1RecvEnd == 0xAA)
@@ -123,6 +143,8 @@ void OnServerHandle(void)
 			tcp->send(&tcp, net_send_buf, net_send_len);				//把数据发送到服务器
 		}
 	}
+	
+	return ret;
 }
 
 //向服务器定时发送传感器数据和心跳包

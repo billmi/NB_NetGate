@@ -5,20 +5,24 @@
 #include "common.h"
 
 //读取/处理网络数据
+u16 time_out = 0;
 u16 NetDataFrameHandle(pTcp *tcp,u8 *outbuf,u8 *hold_reg,CONNECT_STATE_E connect_state)
 {
-	u16 ret = 0;
+	s16 ret = 0;
 	u16 len = 0;
 	u8 buf[1500];
+//	static u16 time_out = 0;
 
 	memset(buf,0,1500);
 
 	len = (*tcp)->read(tcp,buf);
 	if(len != 0)
 	{
+		time_out = 0;
+		
 		if(connect_state == ON_SERVER)
 		{
-			ret = NetDataAnalysis(buf,len,outbuf,hold_reg);
+			ret = (s16)NetDataAnalysis(buf,len,outbuf,hold_reg);
 		}
 
 		if(ret == 0)
@@ -30,6 +34,18 @@ u16 NetDataFrameHandle(pTcp *tcp,u8 *outbuf,u8 *hold_reg,CONNECT_STATE_E connect
 
 		memset(buf,0,len);
 	}
+	else
+	{
+		time_out ++;
+		
+		if(time_out >= 600)		//一分钟内未收到任何数据，强行关闭连接
+		{
+			time_out = 0;
+			
+			ret = -1;
+		}
+	}
+	
 	return ret;
 }
 

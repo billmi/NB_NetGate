@@ -20,7 +20,7 @@ void vTaskNET(void *pvParameters);
 
 
 u8 TryToConnectToServer(void);
-void OnServerHandle(void);
+s8 OnServerHandle(void);
 void SendHeartBeatPacket(void);
 
 u8 GetGpsInfo(u8 **gps_info,u8 *gps_flag,u8 *time_flag);
